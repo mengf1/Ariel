@@ -1,4 +1,2 @@
 # Ariel
-Ariel: Analysis of Rare Incident-Event Languages
-
-- A DARPA project: DARPA LORELEI
+Ariel: Analysis of Rare Incident-Event Languages, which is a DARPA project -- DARPA LORELEI.
