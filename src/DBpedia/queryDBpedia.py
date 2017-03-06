@@ -1,5 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, SPARQLExceptions, JSON
 import json
+import os
+import fnmatch
 
 # Limit is 10000 thus we run multiple times using different offsets
 def queryPerRound(queryStr, offset):
@@ -13,6 +15,7 @@ def queryPerRound(queryStr, offset):
 
 
 def query(queryStr, dataType):
+    print "Start to query the data: " + dataType
     for i in range(1000):
         offset = 0
         if i != 0:
@@ -26,32 +29,35 @@ def query(queryStr, dataType):
         outputFile = dataType + '-' + str(tot) + ".json"
         with open(outputFile, 'w') as f:
             json.dump(results, f)
+    print "Finish querying the data"
 
 
-def extractFile(inputFile, dataType):
+def extractFile(inputFile):
     data = {}
     with open(inputFile, 'r') as f:
         for line in f:
             raw = json.loads(line.strip())
             data = raw["results"]["bindings"]
-    saveFile = dataType + "s.tsv"
-    f = open(saveFile, 'w')
-    # an example for Person: {"person": {"type": "uri", "value": "http://dbpedia.org/resource/Aa_(architect)"}}
-    for item in data:
-        link = item[dataType]['value'].encode('utf-8')
-        parts = link.split('/')
-        name = parts[len(parts) - 1]
-        name = name.replace("_", " ")
-        # print link + "\t"+ name
-        f.write(link + "\t" + name + "\n")
-    f.close()
+    return data
 
 
 def preprocess(dataType):
+    print "Process the raw data"
+    saveFile = dataType + "s.tsv"
+    outputF = open(saveFile, 'w')
     for f in os.listdir("."):
         if fnmatch.fnmatch(f, dataType + "-*.json"):
-            extractFile(f, dataType)
-    print "Finish the " + dataType + " data"
+            data = extractFile(f)
+            # an example for Person: {"person": {"type": "uri", "value": "http://dbpedia.org/resource/Aa_(architect)"}}
+            for item in data:
+                link = item[dataType]['value'].encode('utf-8')
+                parts = link.split('/')
+                name = parts[len(parts) - 1]
+                name = name.replace("_", " ")
+                # print link + "\t"+ name
+                outputF.write(link + "\t" + name + "\n")
+    outputF.close()
+    print "Finish processing " + dataType + " data"
 
 
 if __name__ == "__main__":
@@ -63,7 +69,7 @@ if __name__ == "__main__":
         }"""
     d_type = "person"
     query(queryStr, d_type)
-    preprocess(dataType)
+    preprocess(d_type)
 
     # query locations
     queryStr = """PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
@@ -76,7 +82,7 @@ if __name__ == "__main__":
         } """
     d_type = "location"
     query(queryStr, d_type)
-    preprocess(dataType)
+    preprocess(d_type)
 
     # query organisations
     queryStr = """PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -87,4 +93,4 @@ if __name__ == "__main__":
         }"""
     d_type = "organisation"
     query(queryStr, d_type)
-    preprocess(dataType)
+    preprocess(d_type)
