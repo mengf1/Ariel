@@ -24,16 +24,26 @@ def processGeoNames(altNamesFile, allNamesFile):
             if geo_id in geo2ug:
                 en2geo[geo_en] = geo_id
     # size of geo2en < size of geo2ug
+    print len(geo2ug), len(en2geo)
     return geo2ug, en2geo
 
 # import the GeoNames file
 def processDBlocations(geo2ug, en2geo, locationsFile):
+    outputF = open("ugGeoNames.txt", "w")
+    i = 0
     with open(locationsFile, 'r') as f:
         for line in f:
             link, name = line.strip().split("\t")
             if name in en2geo:
+                i +=1
                 geo_id = en2geo[name]
-                print geo_id, link, geo2ug[geo_id]
+                #print geo_id, link, name, geo2ug[geo_id]
+                re = str(geo_id) +"\t"+link+"\t"+name
+                for item in geo2ug[geo_id]:
+                    re += "\t" + item
+                outputF.write(re+"\n")
+    outputF.close()
+    print "Find", i
 
 if __name__ == "__main__":
     allNamesFile = sys.argv[1]
