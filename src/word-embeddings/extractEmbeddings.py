@@ -2,8 +2,8 @@ import sys
 from sets import Set
 
 def process(inputFile, lstr):
-    # or English - en
-    #sel_set = Set(["en", "de", "nl", "da"])
+    #language set: Set(["en", "de", "nl", "da"])
+    # for example, English - en
     langs=Set(lstr.split("-"))
     with open(inputFile, "r") as f:
         for line in f:
