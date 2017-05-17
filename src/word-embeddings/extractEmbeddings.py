@@ -1,22 +1,26 @@
+import sys
 from sets import Set
-inputFile="fifty_nine.table5.multiCCA.size_40.normalized"
 
-# or Turkish - tr
-#sel_set = Set(["en", "de", "nl", "da"])
-sel_set=Set(["en", "de"])
-langs=[]
-with open(inputFile, "r") as f:
-    for line in f:
-        line = line.strip()
-        tok = line.split()[0]
-        parts = tok.split(":")
-        # for example, ``en::''
-        #if len(parts) > 2:
-        #    print tok
-        lang = parts[0]
-        if lang not in langs:
-            langs.append(lang)
-        if lang in sel_set:
-            print line
+def process(inputFile, lstr):
+    # or English - en
+    #sel_set = Set(["en", "de", "nl", "da"])
+    langs=Set(lstr.split("-"))
+    with open(inputFile, "r") as f:
+        for line in f:
+            line = line.strip()
+            tok = line.split()[0]
+            parts = tok.split(":")
+            # for example, an exception: ``en::''
+            #if len(parts) > 2:
+            #    print tok
+            lang = parts[0]
+            if lang in langs:
+                print line
 
-#print langs, len(langs)
+if __name__ == "__main__":
+    # the file of word embeddings
+    # for example, inputFile="fifty_nine.table5.multiCCA.size_40.normalized"
+    inputFile = sys.argv[1]
+    # for example, en or en-de
+    lstr = sys.argv[2]
+    process(inputFile, lstr)
